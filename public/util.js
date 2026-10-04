@@ -26,10 +26,15 @@ function hasSchedule(s) {
 function isWithinSchedule(s, now) {
   if (!hasSchedule(s)) return true;
   now = now || new Date();
-  if (Array.isArray(s.days) && s.days.length > 0 && s.days.length < 7 && !s.days.includes(now.getDay())) return false;
+  // The hosted service uses Korea time for seat schedules, regardless of viewer location.
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Seoul', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  }).formatToParts(now).map(part => [part.type, part.value]));
+  const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday);
+  if (Array.isArray(s.days) && s.days.length > 0 && s.days.length < 7 && !s.days.includes(day)) return false;
   const st = parseHM(s.start), en = parseHM(s.end);
   if (st == null && en == null) return true;
-  const hm = now.getHours() * 60 + now.getMinutes();
+  const hm = Number(parts.hour) * 60 + Number(parts.minute);
   const a = st == null ? 0 : st;
   const b = en == null ? 1440 : en;
   if (a === b) return true;            // 같으면 종일
