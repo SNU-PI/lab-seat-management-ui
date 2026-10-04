@@ -22,6 +22,10 @@ test('private Blob storage initializes once and retries concurrent writes', asyn
   let conflicts = 0;
   require.cache[blobPath].exports = {
     BlobPreconditionFailedError: originalBlob.BlobPreconditionFailedError,
+    head: async (key) => {
+      assert.equal(key, 'lab-seats/state.json');
+      return { etag: `v${version}` };
+    },
     get: async (key, options) => {
       assert.equal(key, 'lab-seats/state.json');
       assert.equal(options.access, 'private');
@@ -29,7 +33,8 @@ test('private Blob storage initializes once and retries concurrent writes', asyn
       if (value === null) return null;
       return {
         statusCode: 200,
-        blob: { etag: `v${version}` },
+        // CDN content ETags need not equal the control-plane ETag for writes.
+        blob: { etag: `cdn-v${version}` },
         stream: new ReadableStream({ start(controller) {
           controller.enqueue(new TextEncoder().encode(value));
           controller.close();
@@ -55,4 +60,13 @@ test('private Blob storage initializes once and retries concurrent writes', asyn
   })));
   assert.equal((await store.read()).counter, 6);
   assert.ok(conflicts > 0);
+
+  const app = require('../server');
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise(resolve => server.once('listening', resolve));
+  t.after(() => server.close());
+  const base = `http://127.0.0.1:${server.address().port}`;
+  assert.equal((await fetch(base + '/toggle/1/18')).status, 200);
+  const room = await (await fetch(base + '/api/rooms/1')).json();
+  assert.equal(Object.values(room.cells).find(c => c.number === '18').occupied, true);
 });

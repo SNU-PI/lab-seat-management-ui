@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { get, put, BlobPreconditionFailedError } = require('@vercel/blob');
+const { get, head, put, BlobPreconditionFailedError } = require('@vercel/blob');
 const { resetDate } = require('./time');
 
 const key = 'lab-seats/state.json';
@@ -44,6 +44,20 @@ async function readRaw() {
   return { raw: fs.readFileSync(dataFile, 'utf8') };
 }
 
+async function readForUpdate() {
+  const first = await readRaw(); // Initialize the blob if this is the first request.
+  if (!remote) return first;
+
+  // Blob content responses can have a different ETag from the control-plane
+  // version used by conditional put. Bracket the content read with head calls
+  // so the body and write precondition refer to the same stored version.
+  const before = await head(key);
+  const blob = await get(key, { access: 'private', useCache: false });
+  const after = await head(key);
+  if (!blob || blob.statusCode !== 200 || before.etag !== after.etag) return null;
+  return { raw: await new Response(blob.stream).text(), etag: after.etag };
+}
+
 async function writeIfUnchanged(before, after, etag) {
   if (remote) {
     try {
@@ -80,7 +94,9 @@ function clearOccupancy(state) {
 
 async function update(change, resetHour = 2) {
   for (let attempt = 0; attempt < 12; attempt++) {
-    const { raw: before, etag } = await readRaw();
+    const snapshot = await readForUpdate();
+    if (!snapshot) continue;
+    const { raw: before, etag } = snapshot;
     const state = JSON.parse(before);
     if (!state || !state.rooms) throw new Error('Invalid saved room data');
     const today = resetDate(new Date(), resetHour);
@@ -96,6 +112,10 @@ async function update(change, resetHour = 2) {
 }
 
 async function read(resetHour = 2) {
+  const { raw } = await readRaw();
+  const state = JSON.parse(raw);
+  if (!state || !state.rooms) throw new Error('Invalid saved room data');
+  if (state.lastResetDate === resetDate(new Date(), resetHour)) return state;
   return (await update(() => undefined, resetHour)).state;
 }
 

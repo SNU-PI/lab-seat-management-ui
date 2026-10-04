@@ -2,6 +2,7 @@
 
 const express = require('express');
 const path = require('path');
+const { BlobAccessError, BlobStoreNotFoundError, BlobStoreSuspendedError, BlobServiceRateLimited } = require('@vercel/blob');
 const store = require('./store');
 const { koreaTime } = require('./time');
 
@@ -313,8 +314,13 @@ function htmlPage(title, inner) {
 }
 
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(503).json({ error: '데이터 저장소에 연결할 수 없습니다' });
+  console.error(`[${req.method} ${req.path}]`, err);
+  const code = err instanceof BlobAccessError ? 'BLOB_ACCESS_DENIED'
+    : err instanceof BlobStoreNotFoundError ? 'BLOB_STORE_NOT_FOUND'
+    : err instanceof BlobStoreSuspendedError ? 'BLOB_STORE_SUSPENDED'
+    : err instanceof BlobServiceRateLimited ? 'BLOB_RATE_LIMITED'
+    : 'STORAGE_ERROR';
+  res.status(503).json({ error: '데이터 저장소에 연결할 수 없습니다', code });
 });
 
 if (require.main === module) {
