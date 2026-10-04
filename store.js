@@ -2,61 +2,58 @@
 
 const fs = require('fs');
 const path = require('path');
+const { get, put, BlobPreconditionFailedError } = require('@vercel/blob');
 
-const key = 'lab-seats:state';
+const key = 'lab-seats/state.json';
 const seed = require('./seed/rooms.json');
-const url = process.env.UPSTASH_REDIS_REST_URL;
-const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-const remote = Boolean(url && token);
+const remote = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const dataFile = process.env.DATA_FILE || path.join(__dirname, 'data', 'rooms.json');
 
-if (Boolean(url) !== Boolean(token)) {
-  throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set together');
-}
 if (process.env.VERCEL && !remote) {
-  throw new Error('Vercel requires an Upstash Redis database');
+  throw new Error('Connect a private Vercel Blob store before deploying');
 }
 
 function freshState() {
   return JSON.parse(JSON.stringify(seed));
 }
 
-async function command(args) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(args),
-    signal: AbortSignal.timeout(10000)
-  });
-  if (!res.ok) throw new Error(`Redis request failed (${res.status})`);
-  const body = await res.json();
-  if (body.error) throw new Error(`Redis command failed: ${body.error}`);
-  return body.result;
-}
-
 async function readRaw() {
   if (remote) {
-    let raw = await command(['GET', key]);
-    if (raw === null) {
-      await command(['SETNX', key, JSON.stringify(freshState())]);
-      raw = await command(['GET', key]);
+    let blob = await get(key, { access: 'private', useCache: false });
+    if (!blob) {
+      const initial = JSON.stringify(freshState());
+      try {
+        const created = await put(key, initial, {
+          access: 'private', addRandomSuffix: false, contentType: 'application/json'
+        });
+        return { raw: initial, etag: created.etag };
+      } catch (error) {
+        // Another request may have initialized the same blob first.
+        blob = await get(key, { access: 'private', useCache: false });
+        if (!blob) throw error;
+      }
     }
-    return raw;
+    if (blob.statusCode !== 200) throw new Error('Unexpected Blob response');
+    return { raw: await new Response(blob.stream).text(), etag: blob.blob.etag };
   }
   if (!fs.existsSync(dataFile)) {
     fs.mkdirSync(path.dirname(dataFile), { recursive: true });
     fs.writeFileSync(dataFile, JSON.stringify(freshState(), null, 2), { flag: 'wx' });
   }
-  return fs.readFileSync(dataFile, 'utf8');
+  return { raw: fs.readFileSync(dataFile, 'utf8') };
 }
 
-async function writeIfUnchanged(before, after) {
+async function writeIfUnchanged(before, after, etag) {
   if (remote) {
-    return await command([
-      'EVAL',
-      "if redis.call('GET', KEYS[1]) == ARGV[1] then redis.call('SET', KEYS[1], ARGV[2]); return 1 else return 0 end",
-      '1', key, before, after
-    ]) === 1;
+    try {
+      await put(key, after, {
+        access: 'private', addRandomSuffix: false, contentType: 'application/json', ifMatch: etag
+      });
+      return true;
+    } catch (error) {
+      if (error instanceof BlobPreconditionFailedError) return false;
+      throw error;
+    }
   }
   if (fs.readFileSync(dataFile, 'utf8') !== before) return false;
   const tmp = `${dataFile}.${process.pid}.tmp`;
@@ -88,7 +85,7 @@ function clearOccupancy(state) {
 
 async function update(change, resetHour = 2) {
   for (let attempt = 0; attempt < 12; attempt++) {
-    const before = await readRaw();
+    const { raw: before, etag } = await readRaw();
     const state = JSON.parse(before);
     if (!state || !state.rooms) throw new Error('Invalid saved room data');
     const today = resetDate(new Date(), resetHour);
@@ -98,7 +95,7 @@ async function update(change, resetHour = 2) {
     }
     const result = change(state);
     const after = JSON.stringify(state);
-    if (after === before || await writeIfUnchanged(before, after)) return { state, result };
+    if (after === before || await writeIfUnchanged(before, after, etag)) return { state, result };
   }
   throw new Error('Too many concurrent updates; please retry');
 }
