@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.js" },
+    { "source": "/toggle/:path*", "destination": "/api/index.js" },
+    { "source": "/room/:id", "destination": "/api/index.js" },
+    { "source": "/admin", "destination": "/api/index.js" },
+    { "source": "/", "destination": "/api/index.js" }
+  ]
+}

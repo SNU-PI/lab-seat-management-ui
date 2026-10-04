@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>연구실 현황</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="topbar">
+    <a class="btn" href="/">← 목록</a>
+    <h1 id="roomName">연구실</h1>
+    <span class="pill" id="livePill">● 실시간</span>
+    <div class="spacer"></div>
+    <a class="btn" id="otherRoom" href="#">다른 방</a>
+    <a class="btn" id="adminLink" href="/admin">⚙️ 어드민</a>
+  </div>
+
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="t">전체 좌석</div></div>
+      <div class="stat used"><div class="n" id="sUsed">0</div><div class="t">사용 중</div></div>
+      <div class="stat free"><div class="n" id="sFree">0</div><div class="t">공석</div></div>
+      <div class="stat closed" id="statClosed" style="display:none"><div class="n" id="sClosed">0</div><div class="t">이용시간 외</div></div>
+    </div>
+
+    <div class="gridbox">
+      <div id="grid" class="seatgrid"></div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:var(--seat-vacant-bg);border:1px solid var(--seat-vacant)"></i> 공석</span>
+      <span><i style="background:var(--seat-occupied-bg);border:1px solid var(--seat-occupied)"></i> 사용 중</span>
+      <span><i style="background:#3b2f12;border:1px solid #a16207"></i> 🕒 이용시간 외</span>
+      <span><i style="background:#4b5563;border:1px solid #64748b"></i> 사용불가 좌석</span>
+      <span><i style="background:var(--furniture)"></i> 가구</span>
+      <span><i style="background:var(--door)"></i> 문</span>
+      <span><i style="background:var(--window)"></i> 창문</span>
+      <span><i style="background:var(--blocked)"></i> 벽/통로</span>
+    </div>
+    <p class="muted" style="font-size:.82rem">좌석을 클릭하면 접속(토글) 주소를 복사합니다. 🕒 표시는 이용시간이 지정된 좌석입니다.</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/util.js"></script>
+  <script src="/room.js"></script>
+</body>
+</html>

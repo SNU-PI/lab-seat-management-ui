@@ -1,0 +1,345 @@
+{
+  "rooms": {
+    "1": {
+      "name": "138동 512호",
+      "cols": 6,
+      "rows": 10,
+      "cells": {
+        "0,0": {
+          "type": "window"
+        },
+        "0,1": {
+          "type": "window"
+        },
+        "0,2": {
+          "type": "window"
+        },
+        "1,1": {
+          "type": "seat",
+          "number": "1",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,1": {
+          "type": "seat",
+          "number": "2",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "4,1": {
+          "type": "seat",
+          "number": "3",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "5,1": {
+          "type": "seat",
+          "number": "4",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "7,1": {
+          "type": "seat",
+          "number": "5",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "8,1": {
+          "type": "seat",
+          "number": "6",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "1,2": {
+          "type": "seat",
+          "number": "7",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,2": {
+          "type": "seat",
+          "number": "8",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "4,2": {
+          "type": "seat",
+          "number": "9",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "5,2": {
+          "type": "seat",
+          "number": "10",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "7,2": {
+          "type": "seat",
+          "number": "11",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "8,2": {
+          "type": "seat",
+          "number": "12",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,4": {
+          "type": "seat",
+          "number": "13",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,5": {
+          "type": "seat",
+          "number": "14",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "4,5": {
+          "type": "seat",
+          "number": "15",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "4,4": {
+          "type": "seat",
+          "number": "16",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "5,4": {
+          "type": "seat",
+          "number": "17",
+          "disabled": false,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "5,5": {
+          "type": "seat",
+          "number": "18",
+          "disabled": false,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "9,4": {
+          "type": "door"
+        },
+        "0,3": {
+          "type": "window"
+        },
+        "0,4": {
+          "type": "window"
+        },
+        "0,5": {
+          "type": "window"
+        },
+        "1,4": {
+          "type": "furniture",
+          "label": "책장"
+        },
+        "1,5": {
+          "type": "furniture",
+          "label": "책장"
+        },
+        "9,0": {
+          "type": "furniture",
+          "label": "냉장고"
+        },
+        "9,1": {
+          "type": "furniture",
+          "label": "선반"
+        },
+        "9,2": {
+          "type": "furniture",
+          "label": "선반"
+        },
+        "9,3": {
+          "type": "furniture",
+          "label": "선반"
+        },
+        "9,5": {
+          "type": "door"
+        }
+      }
+    },
+    "2": {
+      "name": "302동 319호",
+      "cols": 6,
+      "rows": 4,
+      "cells": {
+        "3,0": {
+          "type": "door"
+        },
+        "0,5": {
+          "type": "seat",
+          "number": "1",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "0,4": {
+          "type": "seat",
+          "number": "2",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "0,3": {
+          "type": "seat",
+          "number": "3",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "0,2": {
+          "type": "seat",
+          "number": "4",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "0,1": {
+          "type": "seat",
+          "number": "5",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,5": {
+          "type": "seat",
+          "number": "6",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,4": {
+          "type": "seat",
+          "number": "7",
+          "disabled": false,
+          "schedule": {
+            "days": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "start": null,
+            "end": null
+          },
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,3": {
+          "type": "seat",
+          "number": "8",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,2": {
+          "type": "seat",
+          "number": "9",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "2,1": {
+          "type": "seat",
+          "number": "10",
+          "disabled": true,
+          "schedule": null,
+          "occupied": false,
+          "occupant": null,
+          "since": null
+        },
+        "3,1": {
+          "type": "blocked"
+        },
+        "3,2": {
+          "type": "blocked"
+        },
+        "3,3": {
+          "type": "blocked"
+        },
+        "3,4": {
+          "type": "blocked"
+        },
+        "3,5": {
+          "type": "blocked"
+        }
+      }
+    }
+  }
+}

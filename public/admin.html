@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>어드민 · 배치도 편집</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="topbar">
+    <a class="btn" href="/">← 목록</a>
+    <h1>⚙️ 배치도 편집</h1>
+    <div class="spacer"></div>
+    <div class="tabbar" id="roomTabs"></div>
+    <label class="fld">어드민 키
+      <input type="password" id="adminKey" placeholder="ADMIN_KEY" style="width:130px">
+    </label>
+  </div>
+
+  <div class="wrap">
+    <div class="toolbar">
+      <label class="fld">연구실 이름
+        <input type="text" id="roomNameInput" style="width:180px">
+      </label>
+      <label class="fld">가로(열)
+        <input type="number" id="colsInput" min="1" max="40" style="width:70px">
+      </label>
+      <label class="fld">세로(행)
+        <input type="number" id="rowsInput" min="1" max="40" style="width:70px">
+      </label>
+      <button class="btn" id="applySize">크기 적용</button>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn primary" id="saveBtn">💾 저장</button>
+      <button class="btn" id="reloadBtn">↺ 되돌리기</button>
+    </div>
+
+    <div class="toolbar" style="margin-top:-4px">
+      <button class="btn" id="clearBtn">🧹 이 방 전체 공석</button>
+      <div class="spacer" style="flex:1"></div>
+      <button class="btn" id="exportBtn">⬇️ 백업 내보내기</button>
+      <button class="btn" id="importBtn">⬆️ 백업 불러오기</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+
+    <div class="tools" id="tools">
+      <div class="tool active" data-tool="seat"><i style="background:var(--seat-vacant)"></i> 자리</div>
+      <div class="tool" data-tool="furniture"><i style="background:var(--furniture)"></i> 가구</div>
+      <div class="tool" data-tool="door"><i style="background:var(--door)"></i> 문</div>
+      <div class="tool" data-tool="window"><i style="background:var(--window)"></i> 창문</div>
+      <div class="tool" data-tool="blocked"><i style="background:var(--blocked)"></i> 벽/통로</div>
+      <div class="tool" data-tool="erase"><i style="background:#0f172a;border:1px solid #475569"></i> 지우기</div>
+      <div class="tool" data-tool="edit"><i style="background:#fbbf24"></i> 자리 수정(번호·사용불가·시간)</div>
+    </div>
+    <p class="muted" style="font-size:.82rem;margin:8px 0 14px">
+      칸을 클릭하거나 드래그해서 칠합니다. <b>자리</b>는 자동으로 다음 번호가 매겨집니다.
+      자리를 <b>자리 수정</b> 도구로 클릭하면 번호 변경 · <b>사용불가 지정</b> · <b>이용시간/요일 제한</b>을 설정할 수 있습니다.
+    </p>
+
+    <div class="gridbox">
+      <div id="grid" class="seatgrid editing"></div>
+    </div>
+
+    <div class="card-block">
+      <h3>📎 자리별 접속 주소 <span class="muted" style="font-weight:400;font-size:.8rem">(인쇄/QR용 · 이 주소에 접속하면 착석↔공석 전환)</span></h3>
+      <table class="links-table" id="linksTable">
+        <thead><tr><th style="width:60px">번호</th><th>접속 주소</th><th style="width:80px"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="muted" id="noSeats" style="display:none">아직 배치된 자리가 없습니다.</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/util.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>

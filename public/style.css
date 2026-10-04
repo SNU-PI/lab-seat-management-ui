@@ -1,0 +1,223 @@
+:root {
+  color-scheme: light dark;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-2: #243149;
+  --border: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #3b82f6;
+  --accent-h: #2563eb;
+
+  --seat-vacant: #16a34a;
+  --seat-vacant-bg: #14532d;
+  --seat-occupied: #dc2626;
+  --seat-occupied-bg: #7f1d1d;
+  --furniture: #475569;
+  --door: #b45309;
+  --window: #0ea5e9;
+  --blocked: #1b2436;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Apple SD Gothic Neo", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+a { color: var(--accent); }
+
+.topbar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  background: var(--panel); position: sticky; top: 0; z-index: 20;
+}
+.topbar h1 { font-size: 1.15rem; margin: 0; }
+.topbar .spacer { flex: 1; }
+.topbar .pill {
+  font-size: .8rem; color: var(--muted); padding: 4px 10px;
+  border: 1px solid var(--border); border-radius: 999px;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 15px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); font-weight: 600;
+  text-decoration: none; cursor: pointer; font-size: .9rem;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-h); }
+.btn.danger { color: #fecaca; border-color: #7f1d1d; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+input[type=text], input[type=number], input[type=password], select {
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; padding: 8px 10px; font-size: .9rem;
+}
+label.fld { display: inline-flex; flex-direction: column; gap: 4px; font-size: .8rem; color: var(--muted); }
+
+/* ── 방 카드 (랜딩) ── */
+.rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.room-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 22px; text-decoration: none; color: var(--text); display: block;
+}
+.room-card:hover { border-color: var(--accent); }
+.room-card h2 { margin: 0 0 10px; }
+.room-card .meta { color: var(--muted); font-size: .9rem; }
+
+/* ── 좌석 배치 그리드 ── */
+:root { --cell: 56px; }
+.gridbox { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 4px; }
+.seatgrid {
+  display: grid; gap: 6px; width: max-content; margin: 0 auto;
+  grid-template-columns: repeat(var(--cols, 8), var(--cell));
+  grid-template-rows: repeat(var(--rows, 6), var(--cell));
+  background: var(--panel); padding: 14px; border-radius: 14px; border: 1px solid var(--border);
+}
+.seatgrid.mini { --cell: 40px; gap: 5px; padding: 10px; }
+.cell {
+  width: var(--cell); height: var(--cell); border-radius: 9px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; font-weight: 700; user-select: none;
+  border: 1px solid transparent;
+}
+.cell .lbl { font-size: .62rem; font-weight: 600; line-height: 1.05; text-align: center; padding: 2px; }
+.cell .clock { position: absolute; top: 1px; right: 3px; font-size: .58rem; line-height: 1; opacity: .9; }
+
+.cell.empty { background: #131c30; border: 1px dashed #283248; }
+.cell.seat { color: #fff; }
+.cell.seat.vacant { background: var(--seat-vacant-bg); border-color: var(--seat-vacant); }
+.cell.seat.occupied { background: var(--seat-occupied-bg); border-color: var(--seat-occupied); }
+.cell.seat .who {
+  position: absolute; bottom: 3px; left: 0; right: 0; text-align: center;
+  font-size: .52rem; font-weight: 600; color: #fecaca; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cell.seat.disabled {
+  background: #4b5563; border-color: #64748b; color: #cbd5e1; opacity: .9;
+}
+.cell.seat.disabled span:first-child { text-decoration: line-through; opacity: .85; }
+.cell.seat.disabled .who { color: #cbd5e1; }
+.cell.seat.closed { background: #3b2f12; border-color: #a16207; color: #fcd34d; }
+.cell.seat.closed .who { color: #fcd34d; }
+.cell.furniture { background: var(--furniture); color: #e2e8f0; }
+.cell.door { background: var(--door); color: #fff; }
+.cell.window { background: var(--window); color: #04293a; }
+.cell.blocked {
+  background: var(--blocked); color: #475569;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 6px, #0c1322 6px, #0c1322 12px);
+}
+
+/* 편집 모드에서만 커서/호버 */
+.editing .cell { cursor: pointer; }
+.editing .cell:hover { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ── 통계/범례 ── */
+.stats { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 18px; }
+.stat {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 18px; min-width: 110px;
+}
+.stat .n { font-size: 1.7rem; font-weight: 800; }
+.stat .t { color: var(--muted); font-size: .8rem; }
+.stat.free .n { color: #4ade80; }
+.stat.used .n { color: #f87171; }
+.stat.closed .n { color: #fcd34d; }
+
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 18px 0 6px; color: var(--muted); font-size: .82rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+/* ── 어드민 도구 ── */
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+.tools { display: flex; gap: 6px; flex-wrap: wrap; }
+.tool {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; font-size: .85rem; font-weight: 600;
+}
+.tool.active { border-color: var(--accent); background: #1e3a8a; }
+.tool i { width: 13px; height: 13px; border-radius: 3px; }
+
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.card-block { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 18px; }
+.card-block h3 { margin: 0 0 12px; font-size: 1rem; }
+
+.links-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.links-table th, .links-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--border); }
+.links-table td.url { font-family: ui-monospace, Menlo, monospace; color: var(--muted); word-break: break-all; }
+
+.toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #064e3b; color: #d1fae5; border: 1px solid #10b981; padding: 11px 18px;
+  border-radius: 10px; opacity: 0; transition: .25s; pointer-events: none; z-index: 50;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.err { background: #4c0519; color: #fecdd3; border-color: #f43f5e; }
+
+/* ── 좌석 편집 모달 ── */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 60; background: rgba(2, 6, 23, .62);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-card {
+  background: var(--panel); border: 1px solid var(--accent); border-radius: 16px;
+  padding: 20px; width: 340px; max-width: 100%; max-height: 90vh; overflow: auto;
+  display: flex; flex-direction: column; gap: 13px; box-shadow: 0 24px 70px rgba(0,0,0,.6);
+}
+.pop-title { font-weight: 700; font-size: 1rem; }
+.modal-card .fld { font-size: .76rem; }
+.modal-card input[type=text] { width: 100%; }
+.pop-check { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--text); cursor: pointer; }
+.pop-check input { width: 16px; height: 16px; }
+.pop-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px; }
+.sep { border: none; border-top: 1px solid var(--border); margin: 1px 0; }
+.small { font-size: .75rem; }
+
+.sched-box { display: flex; flex-direction: column; gap: 10px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.sched-label { font-size: .8rem; color: var(--muted); }
+.days { display: flex; gap: 5px; flex-wrap: wrap; }
+.day { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text); cursor: pointer; font-weight: 600; font-size: .82rem; }
+.day.on { background: #1e3a8a; border-color: var(--accent); color: #fff; }
+.sched-times { display: flex; gap: 12px; }
+input[type=time] { background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; padding: 7px 9px; font-size: .9rem; }
+
+.muted { color: var(--muted); }
+.tabbar { display: flex; gap: 8px; flex-wrap: wrap; }
+.tabbar .btn.active { border-color: var(--accent); background: #1e3a8a; }
+
+/* ── 랜딩: 방별 실시간 배치도 ── */
+#boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 18px; align-items: start; }
+.board { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+.board-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.board-title { font-size: 1.12rem; font-weight: 700; color: var(--text); text-decoration: none; }
+.board-title:hover { color: var(--accent); }
+.chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.chip { font-size: .76rem; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; }
+.chip.used b { color: #f87171; }
+.chip.free b { color: #4ade80; }
+.chip.closed b { color: #fcd34d; }
+.board .seatgrid { background: var(--bg); }
+
+/* ── 모바일 ── */
+@media (max-width: 640px) {
+  :root { --cell: 46px; }
+  .seatgrid.mini { --cell: 34px; }
+  .wrap { padding: 16px 12px 60px; }
+  .topbar { padding: 11px 14px; gap: 10px; }
+  .topbar h1 { font-size: 1.02rem; }
+  .stat { padding: 10px 14px; min-width: 88px; flex: 1; }
+  #boards { grid-template-columns: 1fr; }
+}
+@media (max-width: 400px) {
+  :root { --cell: 40px; }
+  .seatgrid.mini { --cell: 30px; }
+}

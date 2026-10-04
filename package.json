@@ -1,0 +1,14 @@
+{
+  "name": "lab-seat-manager",
+  "version": "1.0.0",
+  "description": "연구실 자리 관리 시스템",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
