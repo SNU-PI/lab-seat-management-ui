@@ -3,12 +3,13 @@
 const express = require('express');
 const path = require('path');
 const store = require('./store');
+const { koreaTime } = require('./time');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ADMIN_KEY = process.env.ADMIN_KEY || 'admin';
-const RESET_HOUR = clampInt(process.env.RESET_HOUR, 0, 23, 2); // 매일 이 시각에 전체 공석 (서버 로컬시간)
+const RESET_HOUR = clampInt(process.env.RESET_HOUR, 0, 23, 2); // 매일 한국 시각 기준 전체 공석
 
 if (process.env.VERCEL && (!ADMIN_KEY || ADMIN_KEY === 'admin')) {
   throw new Error('Set a non-default ADMIN_KEY before deploying');
@@ -77,11 +78,11 @@ function scheduleActive(s) {
 }
 function isWithinSchedule(s, now) {
   if (!scheduleActive(s)) return true;
-  now = now || new Date();
-  if (Array.isArray(s.days) && s.days.length > 0 && s.days.length < 7 && !s.days.includes(now.getDay())) return false;
+  const time = koreaTime(now || new Date());
+  if (Array.isArray(s.days) && s.days.length > 0 && s.days.length < 7 && !s.days.includes(time.weekday)) return false;
   const st = hmToMin(s.start), en = hmToMin(s.end);
   if (st == null && en == null) return true;
-  const hm = now.getHours() * 60 + now.getMinutes();
+  const hm = time.hour * 60 + time.minute;
   const a = st == null ? 0 : st, b = en == null ? 1440 : en;
   if (a === b) return true;
   if (a < b) return hm >= a && hm < b;
@@ -319,7 +320,7 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   app.listen(PORT, HOST, () => {
     console.log(`연구실 자리 관리 시스템: http://${HOST}:${PORT}`);
-    console.log(`시간대: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+    console.log('이용시간 및 공석 초기화 기준: Asia/Seoul');
   });
 }
 

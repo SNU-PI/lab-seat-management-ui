@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { get, put, BlobPreconditionFailedError } = require('@vercel/blob');
+const { resetDate } = require('./time');
 
 const key = 'lab-seats/state.json';
 const seed = require('./seed/rooms.json');
@@ -60,12 +61,6 @@ async function writeIfUnchanged(before, after, etag) {
   fs.writeFileSync(tmp, after);
   fs.renameSync(tmp, dataFile);
   return true;
-}
-
-function resetDate(now, hour) {
-  const date = new Date(now);
-  if (date.getHours() < hour) date.setDate(date.getDate() - 1);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 function clearOccupancy(state) {
