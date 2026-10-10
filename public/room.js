@@ -3,6 +3,9 @@
 const roomId = decodeURIComponent(location.pathname.split('/').pop());
 const grid = document.getElementById('grid');
 const toast = document.getElementById('toast');
+const refreshBtn = document.getElementById('refreshBtn');
+let lastFetch = 0;
+let loading = false;
 
 document.getElementById('otherRoom').href = '/room/' + (roomId === '1' ? '2' : '1');
 
@@ -45,16 +48,27 @@ function escapeHtml(s) {
 }
 
 async function refresh() {
+  if (loading) return;
+  loading = true;
   try {
     const response = await fetch(`/api/rooms/${encodeURIComponent(roomId)}`, { cache: 'no-store' });
     if (!response.ok) throw new Error('연구실 정보를 가져올 수 없습니다');
     render(await response.json());
-    document.getElementById('livePill').textContent = '● 5초마다 갱신';
+    lastFetch = Date.now();
+    document.getElementById('livePill').textContent = '● 1분마다 갱신';
     document.getElementById('livePill').style.color = '';
   } catch (error) {
     document.getElementById('livePill').textContent = '○ 재연결 중…';
     document.getElementById('livePill').style.color = 'var(--muted)';
+  } finally {
+    loading = false;
   }
 }
 refresh();
-setInterval(() => { if (!document.hidden) refresh(); }, 5000);
+refreshBtn.addEventListener('click', refresh);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - lastFetch >= 60000) refresh();
+});
+setInterval(() => {
+  if (!document.hidden && Date.now() - lastFetch >= 60000) refresh();
+}, 60000);

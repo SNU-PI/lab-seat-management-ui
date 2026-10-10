@@ -1,11 +1,15 @@
 'use strict';
 
 const boards = document.getElementById('boards');
+const refreshBtn = document.getElementById('refreshBtn');
+let lastFetch = 0;
+let loading = false;
 
 async function init() {
   const response = await fetch('/api/rooms', { cache: 'no-store' });
   if (!response.ok) throw new Error('방 목록을 가져올 수 없습니다');
   const rooms = await response.json();
+  lastFetch = Date.now();
   boards.innerHTML = '';
   for (const id of Object.keys(rooms)) {
     const board = document.createElement('div');
@@ -40,17 +44,29 @@ function render(board, room) {
 }
 
 async function refresh() {
+  if (loading) return;
+  if (!boards.querySelector('[data-room-id]')) return init();
+  loading = true;
   try {
     const response = await fetch('/api/rooms', { cache: 'no-store' });
     if (!response.ok) throw new Error('방 목록을 가져올 수 없습니다');
     const rooms = await response.json();
+    lastFetch = Date.now();
     for (const board of boards.querySelectorAll('[data-room-id]')) {
       if (rooms[board.dataset.roomId]) render(board, rooms[board.dataset.roomId]);
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    loading = false;
   }
 }
 
 init().catch(error => { boards.textContent = error.message; });
-setInterval(() => { if (!document.hidden) refresh(); }, 5000);
+refreshBtn.addEventListener('click', refresh);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() - lastFetch >= 60000) refresh();
+});
+setInterval(() => {
+  if (!document.hidden && Date.now() - lastFetch >= 60000) refresh();
+}, 60000);
